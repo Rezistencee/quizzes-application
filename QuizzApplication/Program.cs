@@ -9,8 +9,8 @@ namespace QuizzApplication
         static bool isAuthenticated = false;
         static int currentUserId = -1;
         static InMemoryUserRepository userRepository = new InMemoryUserRepository();
+        static InMemoryQuizRepository quizRepository = new InMemoryQuizRepository();
 
-        //TODO: Complete this 4 methods.
         private static void ProcessRegistration()
         {
             Console.WriteLine("Registration: ");
@@ -42,6 +42,7 @@ namespace QuizzApplication
             userRepository.Add(newUser);
         }
 
+
         private static void ProcessAuthorization()
         {
             Console.WriteLine("Authorization: ");
@@ -68,24 +69,67 @@ namespace QuizzApplication
 
         private static void ProcessBrowsingQuizzes()
         {
-            Console.WriteLine("Available quizzes: ");
+            Console.WriteLine("\tAvailable quizzes: ");
             
+            var quizes = quizRepository.GetAll();
+
+            foreach(Quiz quiz in quizes)
+            {
+                Console.WriteLine($"\t{quiz.ID}. {quiz.Title}");
+            }
+
+            Console.WriteLine("\n\n\n");
         }
 
         private static void ProcessSignUpForQuiz()
         {
             Console.WriteLine("Sign up for the quiz: ");
+            Console.WriteLine("Enter quiz ID to join this quiz:");
             
+            int joinableQuizID = Convert.ToInt32(Console.ReadLine());
+
+            Quiz targetQuiz = quizRepository.GetById(joinableQuizID);
+
+            targetQuiz.Start(userRepository.GetById(currentUserId));
+        }
+
+        private static void SetPassword()
+        {
+            Console.WriteLine("Input a new password: ");
+
+            string inputPassword = Console.ReadLine();
+
+            User user = userRepository.GetById(currentUserId);
+
+            user.Password = inputPassword;
+
+            Console.WriteLine("Password was changed!");
+        }
+
+        private static void QuizBuild()
+        {
+            Question tempQuestion = new Question("How many wives did Henry VIII have?", 6);
+            Quiz tempQuiz = new Quiz("History quiz", "Something desc...");
+            tempQuiz.AddQuestion(tempQuestion);
+            quizRepository.Add(tempQuiz);
+
+            tempQuiz = new Quiz("English quiz", "Something desc...");
+            tempQuestion = new Question("We are eating at home tonight\n\nAnswer option:\n1. in\n2. at\n3.in the", 2);
+            tempQuiz.AddQuestion(tempQuestion);
+            quizRepository.Add(tempQuiz);
         }
 
         public static void Main()
         {
+            QuizBuild();
+
             while (state) {
                 Console.WriteLine("1. Registration");
                 Console.WriteLine("2. Authorization");
                 Console.WriteLine("3. Browse available quizzes");
                 Console.WriteLine("4. Sign up for the quiz");
-                Console.WriteLine("5. Exit");
+                Console.WriteLine("5. Set password");
+                Console.WriteLine("0. Exit");
 
                 string choice = Console.ReadLine();
 
@@ -105,7 +149,11 @@ namespace QuizzApplication
 
                     case "3":
                         {
-                            ProcessBrowsingQuizzes();
+                            if (isAuthenticated)
+                                ProcessBrowsingQuizzes();
+                            else
+                                Console.WriteLine("You need to be authenticated in system!");
+
                             break;
                         }
 
@@ -114,8 +162,15 @@ namespace QuizzApplication
                             ProcessSignUpForQuiz();
                             break;
                         }
-
                     case "5":
+                        {
+                            if (isAuthenticated)
+                                SetPassword();
+                            else
+                                Console.WriteLine("You need to be authenticated in system!");
+                            break;
+                        }
+                    case "0":
                         {
                             state = false;
                             break;
