@@ -1,2 +1,2 @@
-# quizzes-application
+# Quizzes Application
 Quizzes console application.
