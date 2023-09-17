@@ -116,6 +116,11 @@ namespace QuizzApplication
             tempQuiz = new Quiz("English quiz", "Something desc...");
             tempQuestion = new Question("We are eating at home tonight\n\nAnswer option:\n1. in\n2. at\n3.in the", 2);
             tempQuiz.AddQuestion(tempQuestion);
+
+            MultyQuestion tempMultyQuestion = new MultyQuestion("Test, anwser is 4 5 7", new int[] { 4, 5, 7 });
+
+            tempQuiz.AddQuestion(tempMultyQuestion);
+
             quizRepository.Add(tempQuiz);
         }
 
@@ -126,10 +131,14 @@ namespace QuizzApplication
             while (state) {
                 Console.WriteLine("1. Registration");
                 Console.WriteLine("2. Authorization");
-                Console.WriteLine("3. Browse available quizzes");
-                Console.WriteLine("4. Sign up for the quiz");
-                Console.WriteLine("5. Set password");
-                Console.WriteLine("0. Exit");
+
+                if (isAuthenticated)
+                {
+                    Console.WriteLine("3. Browse available quizzes");
+                    Console.WriteLine("4. Sign up for the quiz");
+                    Console.WriteLine("5. Set password");
+                    Console.WriteLine("0. Logout");
+                }
 
                 string choice = Console.ReadLine();
 
@@ -159,7 +168,10 @@ namespace QuizzApplication
 
                     case "4":
                         {
-                            ProcessSignUpForQuiz();
+                            if (isAuthenticated)
+                                ProcessSignUpForQuiz();
+                            else
+                                Console.WriteLine("You need to be authenticated in system!");
                             break;
                         }
                     case "5":
@@ -172,7 +184,7 @@ namespace QuizzApplication
                         }
                     case "0":
                         {
-                            state = false;
+                            isAuthenticated = false;
                             break;
                         }
 

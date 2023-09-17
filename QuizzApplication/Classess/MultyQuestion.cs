@@ -39,11 +39,6 @@ namespace QuizzApplication.Classess
         {
             int index = 1;
             Console.WriteLine($"Question title {_title}");
-
-            foreach (var item in _answers)
-            {
-                Console.WriteLine($"\t{index}. {item}");
-            }
         }
 
         public bool isRight(params int[] answers)

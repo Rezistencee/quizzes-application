@@ -105,7 +105,11 @@ namespace QuizzApplication.Classess
 
             _playerResults.Add(currentUser, correctAnswer);
 
+            Console.WriteLine("\n\n\n");
+
             DisplayTopPlayers(20);
+
+            Console.WriteLine("\n\n\n");
         }
     }
 }
