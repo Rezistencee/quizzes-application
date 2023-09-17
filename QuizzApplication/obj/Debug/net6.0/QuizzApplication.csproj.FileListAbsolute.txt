@@ -1,0 +1,15 @@
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\bin\Debug\net6.0\QuizzApplication.exe
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\bin\Debug\net6.0\QuizzApplication.deps.json
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\bin\Debug\net6.0\QuizzApplication.runtimeconfig.json
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\bin\Debug\net6.0\QuizzApplication.dll
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\bin\Debug\net6.0\QuizzApplication.pdb
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\obj\Debug\net6.0\QuizzApplication.csproj.AssemblyReference.cache
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\obj\Debug\net6.0\QuizzApplication.GeneratedMSBuildEditorConfig.editorconfig
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\obj\Debug\net6.0\QuizzApplication.AssemblyInfoInputs.cache
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\obj\Debug\net6.0\QuizzApplication.AssemblyInfo.cs
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\obj\Debug\net6.0\QuizzApplication.csproj.CoreCompileInputs.cache
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\obj\Debug\net6.0\QuizzApplication.dll
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\obj\Debug\net6.0\refint\QuizzApplication.dll
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\obj\Debug\net6.0\QuizzApplication.pdb
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\obj\Debug\net6.0\QuizzApplication.genruntimeconfig.cache
+A:\Visual Projects C#\Quizes\quizzes-application\QuizzApplication\obj\Debug\net6.0\ref\QuizzApplication.dll
