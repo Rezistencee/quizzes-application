@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace QuizzApplication.Interfaces
 {
-    public interface IRepository<T> where T : class
+    public interface IQuestion
     {
-        T GetById(int id);
-        IEnumerable<T> GetAll();
-        void Add(T entity);
-        void Delete(int id);
+        string Title { get; set; }
+        void Display();
+        bool isRight(params int[] answers);
     }
 }
