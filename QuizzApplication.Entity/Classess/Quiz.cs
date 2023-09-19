@@ -1,4 +1,5 @@
-﻿using QuizzApplication.Interfaces;
+﻿using QuizzApplication.Entity.Classess;
+using QuizzApplication.Entity.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,78 +10,55 @@ namespace QuizzApplication.Classess
 {
     public class Quiz
     {
-        private int _id;
-        private string _title;
-        private string _description;
         private Dictionary<User, int> _playerResults = new Dictionary<User, int>();
-        private IQuestion[] _questions;
-        private int _currentPosition;
 
-        public int ID 
-        {
-            get
-            {
-                return _id;
-            }
-            set
-            {
-                if(value > 0)
-                    _id = value;
-                else 
-                    throw new IndexOutOfRangeException();
-            }
-        }
+        public int ID { get; set; }
 
-        public string Title
-        {
-            get 
-            { 
-                return _title; 
-            }
-        }
+        public string Title { get; set; }
 
-        public Quiz()
-        {
-            _id = 0;
-            _title = String.Empty;
-            _description = String.Empty;
-            _questions = null;
-            _currentPosition = 0;
-        }
+        public virtual ICollection<QuestionBase> Questions { get; set; }
+        public virtual ICollection<PlayerResult> PlayerResults { get; set; } = new List<PlayerResult>();
+
+        public Quiz() => Questions = new List<QuestionBase>();
 
         public Quiz(string title, string description)
         {
-            _id = 0;
-            _title = title;
-            _description = description;
-            _questions = new IQuestion[20];
-            _currentPosition = 0;
+            Title = title;
+            Questions = new List<QuestionBase>();
         }
 
-        public Quiz(string title, string description, IQuestion[] questions)
+        public Quiz(string title, string description, List<QuestionBase> questions)
         {
-            _id = 0;
-            _title = title;
-            _description = description;
-            _questions = questions;
-            _currentPosition = questions.Length;
+            Title = title;
+            Questions = questions;
         }
 
-        public void AddQuestion(IQuestion question)
+        public void AddQuestion(QuestionBase question)
         {
-            if(_currentPosition < _questions.Length)
-                _questions[_currentPosition++] = question;
+            Questions.Add(question);
         }
 
         public void DisplayTopPlayers(int topCount)
         {
             Console.WriteLine($"Top {topCount} Players:");
 
-            var sortedResults = _playerResults.OrderByDescending(kv => kv.Value).Take(topCount);
-
-            foreach (var kvp in sortedResults)
+            using (var context = new QuizDBContext())
             {
-                Console.WriteLine($"{kvp.Key.Name}: {kvp.Value} correct answers");
+                var topPlayers = context.PlayerResults
+                    .Where(pr => pr.QuizID == ID)
+                    .OrderByDescending(pr => pr.CorrectAnswers)
+                    .Take(topCount)
+                    .ToList();
+
+                foreach (var playerResult in topPlayers)
+                {
+                    var playerName = context.Users
+                        .Where(u => u.UserId == playerResult.UserID)
+                        .Select(u => u.Name)
+                        .FirstOrDefault();
+
+                    Console.WriteLine($"{playerName}: {playerResult.CorrectAnswers} correct answers");
+                }
             }
         }
 
@@ -89,27 +67,37 @@ namespace QuizzApplication.Classess
             int correctAnswer = 0;
             Console.WriteLine($"You have started taking the quiz: {Title}");
 
-            for(int index = 0; index < _currentPosition; index++)
+            using (var context = new QuizDBContext())
             {
-                _questions[index].Display();
-                Console.WriteLine("Your answer: ");
+                foreach (var question in Questions)
+                {
+                    question.Display();
+                    Console.WriteLine("Your answer: ");
 
-                string[] inputAnswerStr = Console.ReadLine().Split();
-                int[] answer = Array.ConvertAll(inputAnswerStr, Int32.Parse);
+                    string[] inputAnswerStr = Console.ReadLine().Split();
+                    int[] answer = Array.ConvertAll(inputAnswerStr, Int32.Parse);
 
-                if (_questions[index].isRight(answer))
-                    correctAnswer++;
+                    if (question.IsRight(answer))
+                        correctAnswer++;
+                }
+
+                Console.WriteLine($"You finished the quiz! Your correct answer count is {correctAnswer}");
+
+                context.PlayerResults.Add(new PlayerResult
+                {
+                    QuizID = ID,
+                    UserID = currentUser.UserId,
+                    CorrectAnswers = correctAnswer
+                });
+
+                context.SaveChanges();
+
+                Console.WriteLine("\n\n\n");
+
+                DisplayTopPlayers(20);
+
+                Console.WriteLine("\n\n\n");
             }
-
-            Console.WriteLine($"You finished the quiz! Your correct answer count is {correctAnswer}");
-
-            _playerResults.Add(currentUser, correctAnswer);
-
-            Console.WriteLine("\n\n\n");
-
-            DisplayTopPlayers(20);
-
-            Console.WriteLine("\n\n\n");
         }
     }
 }

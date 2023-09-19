@@ -1,4 +1,4 @@
-﻿using QuizzApplication.Interfaces;
+﻿using QuizzApplication.Entity.Classess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,43 +7,30 @@ using System.Threading.Tasks;
 
 namespace QuizzApplication.Classess
 {
-    public class Question : IQuestion
+    public class Question : QuestionBase
     {
-        private string _title;
-        private int _answer;
-
-        public string Title 
-        {
-            get
-            {
-                return _title;
-            }
-            set
-            {
-                _title = value;
-            }
-        }
+        public int Answer { get; set; }
 
         public Question()
         {
-            _title = String.Empty;
-            _answer = 0;
+            Title = String.Empty;
+            Answer = 0;
         }
 
         public Question(string title, int answer)
         {
-            _title = title;
-            _answer = answer;
+            Title = title;
+            Answer = answer;
         }
 
-        public void Display()
+        public override void Display()
         {
-            Console.WriteLine($"Question title {_title}");
+            Console.WriteLine($"Question: {Title}\n");
         }
 
-        public bool isRight(params int[] answers)
+        public override bool IsRight(params int[] answers)
         {
-            if (answers[0] != _answer)
+            if (answers[0] != Answer)
                 return false;
 
             return true;

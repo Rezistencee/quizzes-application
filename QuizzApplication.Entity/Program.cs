@@ -1,4 +1,5 @@
-﻿using QuizzApplication.Classess;
+﻿using Microsoft.EntityFrameworkCore;
+using QuizzApplication.Classess;
 using QuizzApplication.Entity.Context;
 using System;
 
@@ -9,8 +10,6 @@ namespace QuizzApplication
         static bool state = true;
         static bool isAuthenticated = false;
         static int currentUserId = -1;
-        static InMemoryUserRepository userRepository = new InMemoryUserRepository();
-        static InMemoryQuizRepository quizRepository = new InMemoryQuizRepository();
 
         private static void ProcessRegistration()
         {
@@ -50,12 +49,12 @@ namespace QuizzApplication
 
         private static void ProcessAuthorization()
         {
-            Console.WriteLine("Authorization: ");
+            Console.WriteLine("\t| Authorization: ");
 
             Console.WriteLine("Enter your email: ");
             string inputEmail = Console.ReadLine();
 
-            Console.WriteLine("Enter your password: ");
+            Console.WriteLine("\t| Enter your password: ");
             string inputPassword = Console.ReadLine();
 
             using (var context = new QuizDBContext())
@@ -66,11 +65,11 @@ namespace QuizzApplication
                 {
                     isAuthenticated = true;
                     currentUserId = user.UserId;
-                    Console.WriteLine("Authorization successful!");
+                    Console.WriteLine("\t| Authorization successful!");
                 }
                 else
                 {
-                    Console.WriteLine("Invalid email or password. Please try again.");
+                    Console.WriteLine("\t| Invalid email or password. Please try again.");
                 }
             }
         }
@@ -79,11 +78,14 @@ namespace QuizzApplication
         {
             Console.WriteLine("\tAvailable quizzes: ");
 
-            var quizes = quizRepository.GetAll();
-
-            foreach (Quiz quiz in quizes)
+            using(var context = new QuizDBContext())
             {
-                Console.WriteLine($"\t{quiz.ID}. {quiz.Title}");
+                var quizes = context.Quizzes.ToList();
+
+                foreach (Quiz quiz in quizes)
+                {
+                    Console.WriteLine($"\t{quiz.ID}. {quiz.Title}");
+                }
             }
 
             Console.WriteLine("\n\n\n");
@@ -91,19 +93,38 @@ namespace QuizzApplication
 
         private static void ProcessSignUpForQuiz()
         {
-            Console.WriteLine("Sign up for the quiz: ");
-            Console.WriteLine("Enter quiz ID to join this quiz:");
+            Console.WriteLine("\t| Sign up for the quiz: ");
+            Console.WriteLine("\t| Enter quiz ID to join this quiz:");
 
             int joinableQuizID = Convert.ToInt32(Console.ReadLine());
 
-            Quiz targetQuiz = quizRepository.GetById(joinableQuizID);
+            using (var context = new QuizDBContext())
+            {
+                Quiz targetQuiz = context.Quizzes.Include(q => q.Questions).FirstOrDefault(q => q.ID == joinableQuizID);
 
-            targetQuiz.Start(userRepository.GetById(currentUserId));
+                if (targetQuiz != null)
+                {
+                    User currentUser = context.Users.FirstOrDefault(u => u.UserId == currentUserId);
+
+                    if (currentUser != null)
+                    {
+                        targetQuiz.Start(currentUser);
+                    }
+                    else
+                    {
+                        Console.WriteLine("\t| User not found!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\t| Quiz with this ID does not exist!");
+                }
+            }
         }
 
         private static void SetPassword()
         {
-            Console.WriteLine("Input a new password: ");
+            Console.WriteLine("\t| Input a new password: ");
 
             string inputPassword = Console.ReadLine();
 
@@ -116,31 +137,50 @@ namespace QuizzApplication
                     user.Password = inputPassword;
                     context.SaveChanges();
 
-                    Console.WriteLine("Password was changed!");
+                    Console.WriteLine("\t| Password was changed!");
                 }
                 else
                 {
-                    Console.WriteLine("User not found.");
+                    Console.WriteLine("\t| User not found.");
                 }
             }
         }
 
         private static void QuizBuild()
         {
-            Question tempQuestion = new Question("How many wives did Henry VIII have?", 6);
-            Quiz tempQuiz = new Quiz("History quiz", "Something desc...");
-            tempQuiz.AddQuestion(tempQuestion);
-            quizRepository.Add(tempQuiz);
+            using(var context = new QuizDBContext())
+            {
+                Question tempQuestion = new Question
+                {
+                    Title = "How many wives did Henry VIII have?",
+                    Answer = 6
+                };
 
-            tempQuiz = new Quiz("English quiz", "Something desc...");
-            tempQuestion = new Question("We are eating at home tonight\n\nAnswer option:\n1. in\n2. at\n3.in the", 2);
-            tempQuiz.AddQuestion(tempQuestion);
+                Quiz tempQuiz = new Quiz("History quiz", "Something desc...");
+                tempQuiz.AddQuestion(tempQuestion);
+                context.Quizzes.Add(tempQuiz);
 
-            MultyQuestion tempMultyQuestion = new MultyQuestion("Test, anwser is 4 5 7", new int[] { 4, 5, 7 });
+                tempQuiz = new Quiz("English quiz", "Something desc...");
 
-            tempQuiz.AddQuestion(tempMultyQuestion);
+                tempQuestion = new Question
+                {
+                    Title = "We are eating ... home tonight\n\nAnswer option:\n1. in\n2. at\n3.in the",
+                    Answer = 2
+                };
+                tempQuiz.AddQuestion(tempQuestion);
 
-            quizRepository.Add(tempQuiz);
+                MultyQuestion tempMultyQuestion = new MultyQuestion
+                {
+                    Title = "Test,anwser is 4 5 7",
+                    Answers = new List<int> { 4, 5, 7 }
+                };
+
+                tempQuiz.AddQuestion(tempMultyQuestion);
+
+                context.Quizzes.Add(tempQuiz);
+
+                context.SaveChanges();
+            }
         }
 
         public static void Main()
@@ -205,6 +245,7 @@ namespace QuizzApplication
                     case "0":
                         {
                             isAuthenticated = false;
+                            currentUserId = -1;
                             break;
                         }
 

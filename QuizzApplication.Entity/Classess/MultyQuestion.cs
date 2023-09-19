@@ -1,4 +1,4 @@
-﻿using QuizzApplication.Interfaces;
+﻿using QuizzApplication.Entity.Classess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,48 +7,36 @@ using System.Threading.Tasks;
 
 namespace QuizzApplication.Classess
 {
-    public class MultyQuestion : IQuestion
+    public class MultyQuestion : QuestionBase
     {
-
-        private string _title;
-        private int[] _answers;
-
-        public string Title { get; set; }
-
-        public string Answer
-        {
-            get
-            {
-                return _title;
-            }
-        }
+        public List<int> Answers { get; set; }
 
         public MultyQuestion()
         {
-            _title = String.Empty;
-            _answers = null;
+            Title = String.Empty;
+            Answers = null;
         }
 
-        public MultyQuestion(string title, int[] answers)
+        public MultyQuestion(string title, List<int> answers)
         {
-            _title = title;
-            _answers = answers;
+            Title = title;
+            Answers = answers;
         }
 
-        public void Display()
+        public override void Display()
         {
             int index = 1;
-            Console.WriteLine($"Question title {_title}");
+            Console.WriteLine($"Question title {Title}");
         }
 
-        public bool isRight(params int[] answers)
+        public override bool IsRight(params int[] answers)
         {
-            if (_answers == null || answers.Length != _answers.Length)
+            if (Answers == null || answers.Length != Answers.Count)
                 return false;
 
             for (int index = 0; index < answers.Length; index++)
             {
-                if (answers[index] != _answers[index])
+                if (answers[index] != Answers[index])
                     return false;
             }
 
