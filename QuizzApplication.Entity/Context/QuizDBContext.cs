@@ -42,9 +42,9 @@ namespace QuizzApplication.Entity.Context
                 .WithMany()
                 .HasForeignKey(pr => pr.UserID);
 
-            modelBuilder.Entity<QuestionBase>().ToTable("Questions"); // Укажите таблицу для QuestionBase
-            modelBuilder.Entity<Question>().HasBaseType<QuestionBase>(); // Укажите, что Question является производным от QuestionBase
-            modelBuilder.Entity<MultyQuestion>().HasBaseType<QuestionBase>(); // Аналогично для MultyQuestion
+            modelBuilder.Entity<QuestionBase>().ToTable("Questions");
+            modelBuilder.Entity<Question>().HasBaseType<QuestionBase>();
+            modelBuilder.Entity<MultyQuestion>().HasBaseType<QuestionBase>();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
